@@ -1,68 +1,70 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
+<head>
     <meta charset="utf-8">
     <title>Randonnées</title>
+
+
     <link rel="stylesheet" href="css/basics.css" media="screen" title="no title" charset="utf-8">
-  </head>
-  <body>
-    <h1>Liste des randonnées</h1>
-    <table>
-      <a href="create.php">Retour au formulaire</a>
-      <?php
-echo "<table style='border: solid 1px black;'>";
-// echo "<tr><th>Id</th><th>Firstname</th><th>Lastname</th></tr>";
-echo "<tr>
+</head>
+<body>
 
-<th>Id</th>
-<th>Nom</th>
-<th>Distance</th>
-<th>Difficulté</th>
-<th>Durée</th>
-<th>Dénivellé</th>
-</tr>";
+<h1>Liste des randonnées</h1>
 
-class TableRows extends RecursiveIteratorIterator {
-    function __construct($it) {
-        parent::__construct($it, self::LEAVES_ONLY);
-    }
 
-    function current() {
-        return "<td style='width:150px;border:1px solid black;'>" . parent::current(). "</td>";
-    }
+<div class="liens">
+    <a href="index.php" id="retour">Retour au formulaire</a><br>
+</div>
 
-    function beginChildren() {
-        echo "<tr>";
-    }
+        <table>
+            <!-- Afficher la liste des randonnées -->
+            <?php
+            include("connect.php");
+            $reponse = $pdo->query('SELECT * FROM hiking');
+            $reponse1 = $reponse->fetchAll();
+            // var_dump($reponse1);
+            foreach ($reponse1 as $value) {
+                ?>
+                <div id="corps">
+                    <div id="text">
+                <p><b><span id="oran">/// Nom de la randonnée : </span></b><?= $value->name ?><br>
+                    <b><span id="oran">/// Difficulté : </span></b><?= $value->difficulty ?><br>
+                    <b><span id="oran">/// Distance : </span></b><?= $value->distance ?> kilomètres<br>
+                    <b><span id="oran">/// Durée : </span></b><?= $value->duration ?> heures<br>
+                    <b><span id="oran">/// Dénivelé : </span></b><?= $value->height_difference ?> mètres<br>
+                    <b><span id="oran">/// Idée : </span></b><?= $value->idee ?>
 
-    function endChildren() {
-        echo "</tr>" . "\n";
-    }
-}
+                </p>
+                    </div>
+                </div>
 
-$servername = "localhost";
-$username = "root";
-$password = "Adoc7";
-$dbname = "reunion_island";
+<!--<div id="ens-bt-suppr-edit">-->
+                <form  action="delete.php" method="post">
+                    <input  type="hidden" type="number" name="id" value="<?= $value->id?>">
+                    <input class="del-mod" type="submit" value="supprimer">
+                </form>
 
-try {
-    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $stmt = $conn->prepare("SELECT id, name, difficulty, distance, duration, height_difference FROM hiking");
-    $stmt->execute();
+                <form  action="update.php" method="post">
+                    <input  type="hidden" type="number" name="id" value="<?= $value->id ?>">
+                    <input class="del-mod" type="submit" value="edit">
+                </form>
+<!--</div>-->
 
-    // set the resulting array to associative
-    $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
-    foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
-        echo $v;
-    }
-}
-catch(PDOException $e) {
-    echo "Error: " . $e->getMessage();
-}
-$conn = null;
-echo "</table>";
-?>
-    </table>
-  </body>
+                <?php
+            }
+            ?>
+
+        </table>
+</body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
